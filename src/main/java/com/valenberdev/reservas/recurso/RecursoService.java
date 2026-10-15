@@ -1,9 +1,8 @@
 package com.valenberdev.reservas.recurso;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
+import com.valenberdev.reservas.common.exception.NoEncontradoException;
 
 import java.util.List;
 
@@ -46,7 +45,7 @@ public class RecursoService {
     }
 
     private Recurso buscar(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recurso no encontrado"));
-    }
+       return repository.findById(id)
+               .orElseThrow(() -> new NoEncontradoException("No existe un recurso con id " + id));
+   }
 }
