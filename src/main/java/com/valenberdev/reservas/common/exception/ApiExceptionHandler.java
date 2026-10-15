@@ -26,6 +26,13 @@ public class ApiExceptionHandler {
         return problema;
     }
 
+    @ExceptionHandler(SolicitudInvalidaException.class)
+    public ProblemDetail solicitudInvalida(SolicitudInvalidaException ex) {
+        ProblemDetail problema = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        problema.setTitle("Solicitud inválida");
+        return problema;
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail validacion(MethodArgumentNotValidException ex) {
         ProblemDetail problema = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Hay campos inválidos");
