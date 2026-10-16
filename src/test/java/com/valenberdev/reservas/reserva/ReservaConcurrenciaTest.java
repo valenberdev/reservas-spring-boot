@@ -62,7 +62,7 @@ class ReservaConcurrenciaTest {
 
         Instant inicio = Instant.now().plus(7, ChronoUnit.DAYS);
         ReservaRequest request = new ReservaRequest(
-                recurso.getId(), usuario.getId(), inicio, inicio.plus(1, ChronoUnit.HOURS));
+           recurso.getId(), inicio, inicio.plus(1, ChronoUnit.HOURS));
 
         int intentos = 30;
         ExecutorService pool = Executors.newFixedThreadPool(intentos);
@@ -75,7 +75,7 @@ class ReservaConcurrenciaTest {
                 listos.countDown();
                 largada.await();
                 try {
-                    reservaService.crear(request);
+                    reservaService.crear(usuario.getId(), request);
                     return true;
                 } catch (ConflictoException e) {
                     return false;

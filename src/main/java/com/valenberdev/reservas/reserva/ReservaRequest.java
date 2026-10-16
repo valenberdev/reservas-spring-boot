@@ -6,7 +6,6 @@ import java.time.Instant;
 
 public record ReservaRequest(
         @NotNull Long recursoId,
-        @NotNull Long usuarioId,
         @NotNull Instant inicio,
         @NotNull Instant fin
 ) {

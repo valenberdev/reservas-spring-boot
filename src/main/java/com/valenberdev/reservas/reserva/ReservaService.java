@@ -42,7 +42,7 @@ public class ReservaService {
     }
 
     @Transactional
-    public ReservaResponse crear(ReservaRequest request) {
+    public ReservaResponse crear(Long usuarioId, ReservaRequest request) {
         if (!request.fin().isAfter(request.inicio())) {
             throw new SolicitudInvalidaException("La fecha de fin debe ser posterior a la de inicio");
         }
@@ -56,8 +56,8 @@ public class ReservaService {
             throw new ConflictoException("El recurso no está disponible");
         }
 
-        Usuario usuario = usuarioRepository.findById(request.usuarioId())
-                .orElseThrow(() -> new NoEncontradoException("No existe un usuario con id " + request.usuarioId()));
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new NoEncontradoException("No existe un usuario con id " + usuarioId));
 
         try {
             Reserva reserva = new Reserva(recurso, usuario, request.inicio(), request.fin());
@@ -78,8 +78,9 @@ public class ReservaService {
     }
 
     @Transactional
-    public ReservaResponse cancelar(Long id) {
+    public ReservaResponse cancelar(Long usuarioId, Long id) {
         Reserva reserva = reservaRepository.findById(id)
+                .filter(r -> r.getUsuario().getId().equals(usuarioId))
                 .orElseThrow(() -> new NoEncontradoException("No existe una reserva con id " + id));
 
         if (reserva.getEstado() == EstadoReserva.CANCELADA) {
