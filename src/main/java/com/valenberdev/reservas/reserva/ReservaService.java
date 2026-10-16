@@ -50,7 +50,7 @@ public class ReservaService {
             throw new SolicitudInvalidaException("La reserva debe comenzar en el futuro");
         }
 
-        Recurso recurso = recursoRepository.findById(request.recursoId())
+        Recurso recurso = recursoRepository.findWithLockById(request.recursoId())
                 .orElseThrow(() -> new NoEncontradoException("No existe un recurso con id " + request.recursoId()));
         if (!recurso.isActivo()) {
             throw new ConflictoException("El recurso no está disponible");
