@@ -5,6 +5,8 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -50,6 +52,22 @@ public class ApiExceptionHandler {
     public ProblemDetail credencialesInvalidas(CredencialesInvalidasException ex) {
         ProblemDetail problema = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
         problema.setTitle("No autenticado");
+        return problema;
+    }
+
+        @ExceptionHandler(AuthenticationException.class)
+    public ProblemDetail noAutenticado(AuthenticationException ex) {
+        ProblemDetail problema = ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNAUTHORIZED, "Token ausente, inválido o vencido");
+        problema.setTitle("No autenticado");
+        return problema;
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ProblemDetail accesoDenegado(AccessDeniedException ex) {
+        ProblemDetail problema = ProblemDetail.forStatusAndDetail(
+                HttpStatus.FORBIDDEN, "No tenés permisos para esta operación");
+        problema.setTitle("Acceso denegado");
         return problema;
     }
 }
