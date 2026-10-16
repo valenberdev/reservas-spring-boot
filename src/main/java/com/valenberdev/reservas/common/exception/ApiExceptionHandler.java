@@ -45,4 +45,11 @@ public class ApiExceptionHandler {
 
         return problema;
     }
+
+    @ExceptionHandler(CredencialesInvalidasException.class)
+    public ProblemDetail credencialesInvalidas(CredencialesInvalidasException ex) {
+        ProblemDetail problema = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
+        problema.setTitle("No autenticado");
+        return problema;
+    }
 }
