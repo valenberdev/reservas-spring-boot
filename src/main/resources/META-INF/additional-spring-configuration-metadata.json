@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "reservas.cancelacion.horas-minimas",
+      "type": "java.lang.Long",
+      "description": "Horas minimas de anticipacion para poder cancelar una reserva."
+    }
+  ]
+}
