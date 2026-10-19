@@ -7,7 +7,7 @@ import com.valenberdev.reservas.recurso.Recurso;
 import com.valenberdev.reservas.recurso.RecursoRepository;
 import com.valenberdev.reservas.usuario.Usuario;
 import com.valenberdev.reservas.usuario.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Value;
+import com.valenberdev.reservas.common.config.ReservasProperties;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,17 +30,17 @@ public class ReservaService {
     private final Clock clock;
     private final long horasMinimasCancelacion;
 
-    public ReservaService(ReservaRepository reservaRepository,
-                          RecursoRepository recursoRepository,
-                          UsuarioRepository usuarioRepository,
-                          Clock clock,
-                          @Value("${reservas.cancelacion.horas-minimas}") long horasMinimasCancelacion) {
-        this.reservaRepository = reservaRepository;
-        this.recursoRepository = recursoRepository;
-        this.usuarioRepository = usuarioRepository;
-        this.clock = clock;
-        this.horasMinimasCancelacion = horasMinimasCancelacion;
-    }
+        public ReservaService(ReservaRepository reservaRepository,
+                             RecursoRepository recursoRepository,
+                             UsuarioRepository usuarioRepository,
+                             Clock clock,
+                             ReservasProperties propiedades) {
+           this.reservaRepository = reservaRepository;
+           this.recursoRepository = recursoRepository;
+           this.usuarioRepository = usuarioRepository;
+           this.clock = clock;
+           this.horasMinimasCancelacion = propiedades.cancelacion().horasMinimas();
+       }
 
     @Transactional
     public ReservaResponse crear(Long usuarioId, ReservaRequest request) {

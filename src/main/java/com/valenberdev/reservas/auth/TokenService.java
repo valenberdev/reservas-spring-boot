@@ -1,7 +1,7 @@
 package com.valenberdev.reservas.auth;
 
+import com.valenberdev.reservas.common.config.ReservasProperties;
 import com.valenberdev.reservas.usuario.Usuario;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -20,12 +20,10 @@ public class TokenService {
     private final Clock clock;
     private final long expiracionMinutos;
 
-    public TokenService(JwtEncoder encoder,
-                        Clock clock,
-                        @Value("${reservas.jwt.expiracion-minutos}") long expiracionMinutos) {
+    public TokenService(JwtEncoder encoder, Clock clock, ReservasProperties propiedades) {
         this.encoder = encoder;
         this.clock = clock;
-        this.expiracionMinutos = expiracionMinutos;
+        this.expiracionMinutos = propiedades.jwt().expiracionMinutos();
     }
 
     public TokenResponse generar(Usuario usuario) {

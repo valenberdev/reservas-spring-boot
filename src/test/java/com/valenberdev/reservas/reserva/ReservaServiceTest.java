@@ -8,6 +8,7 @@ import com.valenberdev.reservas.recurso.RecursoRepository;
 import com.valenberdev.reservas.usuario.Rol;
 import com.valenberdev.reservas.usuario.Usuario;
 import com.valenberdev.reservas.usuario.UsuarioRepository;
+import com.valenberdev.reservas.common.config.ReservasProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,7 +46,8 @@ class ReservaServiceTest {
     @BeforeEach
     void setUp() {
         Clock reloj = Clock.fixed(AHORA, ZoneOffset.UTC);
-        service = new ReservaService(reservaRepository, recursoRepository, usuarioRepository, reloj, 24);
+        ReservasProperties propiedades = new ReservasProperties(new ReservasProperties.Cancelacion(24), null, null, null);
+        service = new ReservaService(reservaRepository, recursoRepository, usuarioRepository, reloj, propiedades);
     }
 
     private Reserva reservaDe(Long usuarioId, Instant inicio) {
