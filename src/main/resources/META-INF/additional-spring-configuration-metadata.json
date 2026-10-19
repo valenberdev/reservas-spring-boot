@@ -14,6 +14,11 @@
       "name": "reservas.jwt.expiracion-minutos",
       "type": "java.lang.Long",
       "description": "Minutos de validez de un token JWT."
+    },
+    {
+      "name": "reservas.finalizacion.cron",
+      "type": "java.lang.String",
+      "description": "Expresion cron (6 campos) con la que se finalizan las reservas vencidas."
     }
   ]
 }
