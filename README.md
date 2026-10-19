@@ -6,8 +6,8 @@ API REST para reservar recursos (canchas, salas, turnos) por franjas horarias. E
 
 ## Demo en línea
 
-- API: <https://TU-URL.onrender.com>
-- Documentación interactiva: <https://TU-URL.onrender.com/swagger-ui/index.html>
+- API: <https://reservas-api-tf38.onrender.com>
+- Documentación interactiva: <https://reservas-api-tf38.onrender.com/swagger-ui/index.html>
 
 La demo corre en el plan gratuito de Render: el servicio se apaga tras 15 minutos sin tráfico, así que **la primera solicitud puede tardar cerca de un minuto**. La base de datos gratuita se recrea periódicamente, por lo que los datos de la demo no son permanentes.
 
