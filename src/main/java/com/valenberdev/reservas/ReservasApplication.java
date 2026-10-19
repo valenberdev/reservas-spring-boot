@@ -1,13 +1,11 @@
 package com.valenberdev.reservas;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.valenberdev.reservas.support.IntegracionTest;
+import org.junit.jupiter.api.Test;
 
-@SpringBootApplication
-public class ReservasApplication {
+class ReservasApplicationTests extends IntegracionTest {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ReservasApplication.class, args);
-	}
-
+    @Test
+    void contextLoads() {
+    }
 }
