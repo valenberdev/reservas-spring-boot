@@ -1,14 +1,18 @@
 package com.valenberdev.reservas.usuario;
 
 import com.valenberdev.reservas.common.exception.ConflictoException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.SQLException;
 import java.util.Locale;
 
 @Service
 public class UsuarioService {
+
+    private static final String SQLSTATE_UNIQUE_VIOLATION = "23505";
 
     private final UsuarioRepository repository;
     private final PasswordEncoder passwordEncoder;
@@ -27,6 +31,18 @@ public class UsuarioService {
         }
 
         Usuario usuario = new Usuario(email, passwordEncoder.encode(request.password()), Rol.CLIENTE);
-        return UsuarioResponse.desde(repository.save(usuario));
+        try {
+            return UsuarioResponse.desde(repository.saveAndFlush(usuario));
+        } catch (DataIntegrityViolationException ex) {
+            if (esEmailDuplicado(ex)) {
+                throw new ConflictoException("El email ya está registrado");
+            }
+            throw ex;
+        }
+    }
+
+    private boolean esEmailDuplicado(DataIntegrityViolationException ex) {
+        return ex.getMostSpecificCause() instanceof SQLException sql
+                && SQLSTATE_UNIQUE_VIOLATION.equals(sql.getSQLState());
     }
 }
