@@ -83,8 +83,8 @@ public class ReservaService {
                 .filter(r -> r.getUsuario().getId().equals(usuarioId))
                 .orElseThrow(() -> new NoEncontradoException("No existe una reserva con id " + id));
 
-        if (reserva.getEstado() == EstadoReserva.CANCELADA) {
-            throw new ConflictoException("La reserva ya está cancelada");
+        if (reserva.getEstado() != EstadoReserva.ACTIVA) {
+            throw new ConflictoException("La reserva no está activa");
         }
 
         Instant limite = reserva.getInicio().minus(horasMinimasCancelacion, ChronoUnit.HOURS);

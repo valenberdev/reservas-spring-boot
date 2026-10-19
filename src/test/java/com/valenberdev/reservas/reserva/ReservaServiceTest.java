@@ -121,4 +121,13 @@ class ReservaServiceTest {
 
         assertThatThrownBy(() -> service.crear(1L, request)).isInstanceOf(ConflictoException.class);
     }
+
+    @Test
+    void rechazaCancelarReservaQueNoEstaActiva() {
+        Reserva reserva = reservaDe(1L, AHORA.plus(48, ChronoUnit.HOURS));
+        ReflectionTestUtils.setField(reserva, "estado", EstadoReserva.FINALIZADA);
+        when(reservaRepository.findById(10L)).thenReturn(Optional.of(reserva));
+
+        assertThatThrownBy(() -> service.cancelar(1L, 10L)).isInstanceOf(ConflictoException.class);
+    }
 }
