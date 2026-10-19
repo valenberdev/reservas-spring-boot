@@ -16,7 +16,8 @@ import java.sql.SQLException;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
+import com.valenberdev.reservas.common.PaginaResponse;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class ReservaService {
@@ -71,10 +72,10 @@ public class ReservaService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReservaResponse> listarPorUsuario(Long usuarioId) {
-        return reservaRepository.findByUsuarioIdOrderByInicioDesc(usuarioId).stream()
-                .map(ReservaResponse::desde)
-                .toList();
+       public PaginaResponse<ReservaResponse> listarPorUsuario(Long usuarioId, Pageable pageable) {
+           return PaginaResponse.desde(
+                   reservaRepository.findByUsuarioIdOrderByInicioDesc(usuarioId, pageable),
+                   ReservaResponse::desde);
     }
 
     @Transactional
