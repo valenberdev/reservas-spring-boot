@@ -101,4 +101,9 @@ public class ReservaService {
         return ex.getMostSpecificCause() instanceof SQLException sql
                 && SQLSTATE_EXCLUSION_VIOLATION.equals(sql.getSQLState());
     }
+
+    @Transactional
+    public int finalizarVencidas() {
+        return reservaRepository.finalizarVencidas(clock.instant());
+    }
 }
