@@ -34,3 +34,12 @@ jobs:
         with:
           name: surefire-reports
           path: target/surefire-reports/
+    
+  docker-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Construir la imagen
+        run: docker build -t reservas:ci .
