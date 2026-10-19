@@ -4,6 +4,13 @@
 
 API REST para reservar recursos (canchas, salas, turnos) por franjas horarias. El foco del proyecto es **garantizar que nunca existan dos reservas activas superpuestas sobre el mismo recurso**, aunque lleguen decenas de solicitudes simultáneas, y demostrarlo con tests.
 
+## Demo en línea
+
+- API: <https://TU-URL.onrender.com>
+- Documentación interactiva: <https://TU-URL.onrender.com/swagger-ui/index.html>
+
+La demo corre en el plan gratuito de Render: el servicio se apaga tras 15 minutos sin tráfico, así que **la primera solicitud puede tardar cerca de un minuto**. La base de datos gratuita se recrea periódicamente, por lo que los datos de la demo no son permanentes.
+
 ## Stack
 
 - Java 21, Spring Boot 4, Spring Data JPA
@@ -123,3 +130,5 @@ Reglas de negocio: solo se reserva en el futuro, el recurso debe estar activo, y
 - **Job programado sin coordinación:** con más de una instancia correrían todas a la vez. Hoy es inofensivo porque la operación es idempotente; con tareas no idempotentes haría falta algo como ShedLock.
 - **Swagger UI es público.**
 - **Reglas de dominio mínimas:** no hay duración máxima de reserva, límite de reservas por usuario ni horarios de atención.
+- **En el plan gratuito, el job de finalización no corre mientras el servicio duerme.** Al despertar, el primer ciclo recupera lo pendiente.
+- **El entorno de demo no es de producción real:** la base gratuita expira y no tiene backups.
