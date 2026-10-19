@@ -3,18 +3,13 @@ package com.valenberdev.reservas.reserva;
 import com.valenberdev.reservas.common.exception.ConflictoException;
 import com.valenberdev.reservas.recurso.Recurso;
 import com.valenberdev.reservas.recurso.RecursoRepository;
+import com.valenberdev.reservas.support.IntegracionTest;
 import com.valenberdev.reservas.usuario.Rol;
 import com.valenberdev.reservas.usuario.Usuario;
 import com.valenberdev.reservas.usuario.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.postgresql.PostgreSQLContainer;
-import org.testcontainers.utility.DockerImageName;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -28,13 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
-@Testcontainers
-class ReservaConcurrenciaTest {
-
-    @Container
-    @ServiceConnection
-    static PostgreSQLContainer postgres = new PostgreSQLContainer(DockerImageName.parse("postgres:16"));
+class ReservaConcurrenciaTest extends IntegracionTest {
 
     @Autowired
     ReservaService reservaService;
@@ -62,7 +51,7 @@ class ReservaConcurrenciaTest {
 
         Instant inicio = Instant.now().plus(7, ChronoUnit.DAYS);
         ReservaRequest request = new ReservaRequest(
-           recurso.getId(), inicio, inicio.plus(1, ChronoUnit.HOURS));
+                recurso.getId(), inicio, inicio.plus(1, ChronoUnit.HOURS));
 
         int intentos = 30;
         ExecutorService pool = Executors.newFixedThreadPool(intentos);
