@@ -3,9 +3,14 @@ package com.valenberdev.reservas.recurso;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
 
+
+@Tag(name = "Reservas")
+@SecurityRequirement(name = "bearerAuth")
 @RestController
 @RequestMapping("/api/recursos")
 public class RecursoController {
