@@ -98,3 +98,28 @@ Las fechas se manejan siempre como instantes en UTC.
 | GET               | `/actuator/health`                    | Público     | Estado de la aplicación y la base    |
 
 Reglas de negocio: solo se reserva en el futuro, el recurso debe estar activo, y una reserva se cancela hasta 24 horas antes del inicio (configurable). Un job programado pasa a `FINALIZADA` las reservas activas cuyo horario ya terminó.
+
+## Decisiones técnicas
+
+**Anti-solapamiento en la base, no en Java.** Un chequeo en Java ("¿hay una reserva que se pisa? no, entonces guardo") tiene una condición de carrera: dos solicitudes simultáneas pasan el chequeo y las dos guardan. La garantía es una _exclusion constraint_ de PostgreSQL (`EXCLUDE USING gist` sobre `recurso_id` y `tstzrange(inicio, fin)`), parcial para reservas `ACTIVA`, con rango semiabierto: 10:00-11:00 y 11:00-12:00 no se pisan. El bloqueo optimista con `@Version` no sirve acá, porque versiona una fila existente y el conflicto ocurre entre dos filas nuevas.
+
+**Bloqueo pesimista por recurso.** El test de concurrencia reveló un _deadlock_ de PostgreSQL cuando varios inserts superpuestos se esperaban en cruz, y salía como un 500. Ahora cada reserva toma primero un bloqueo (`SELECT ... FOR UPDATE`) sobre el recurso: las reservas del mismo recurso se procesan de a una y las de recursos distintos siguen en paralelo. El bloqueo ordena el tráfico; la restricción de la base sigue siendo la garantía final. Costo: el rendimiento por recurso queda serializado, aceptable para este dominio.
+
+**Tests contra PostgreSQL real.** La restricción de exclusión no existe en bases en memoria como H2, así que los tests de integración usan Testcontainers. El test de concurrencia lanza 30 solicitudes simultáneas al mismo horario y exige exactamente una reserva creada.
+
+**JWT stateless con `oauth2-resource-server`.** La validación del token la hace una librería probada en lugar de un filtro escrito a mano. El secreto sale de una variable de entorno y en producción no tiene valor por defecto: sin él, la app no arranca. El id del usuario sale del token (`sub`), nunca del body, así que nadie puede operar en nombre de otro.
+
+**Errores uniformes con `ProblemDetail` (RFC 9457).** Los servicios lanzan excepciones de dominio sin saber de HTTP, y un único `@RestControllerAdvice` las traduce. Los errores de seguridad (401/403), que ocurren en un filtro, se redirigen a ese mismo handler. Intentar cancelar la reserva de otro usuario responde 404 y no 403, para no revelar qué ids existen.
+
+**Estructura por feature.** Cada feature (`recurso`, `reserva`, `usuario`, `auth`) agrupa su controller, service, repositorio, entidad y DTOs. La API nunca expone entidades.
+
+**Configuración.** Migraciones versionadas con Flyway y `ddl-auto=validate`. Propiedades propias tipadas y validadas en `ReservasProperties`. Perfiles `dev` y `prod`, y un `Clock` inyectable que permite testear reglas de tiempo (por ejemplo, el borde exacto de las 24 horas) sin esperar.
+
+## Limitaciones conocidas
+
+- **Los roles viajan en el token.** Si cambia el rol de un usuario, su token sigue valiendo con el rol anterior hasta que vence (60 minutos por defecto). Es una consecuencia de que el JWT sea stateless. No hay _refresh tokens_ ni revocación.
+- **Sin protección contra fuerza bruta** en el login (límite de intentos). Además, un email inexistente responde algo más rápido que uno existente, lo que permitiría detectarlo midiendo tiempos.
+- **HS256** usa el mismo secreto para firmar y verificar. Alcanza para un único servicio; con varios servicios correspondería firma asimétrica.
+- **Job programado sin coordinación:** con más de una instancia correrían todas a la vez. Hoy es inofensivo porque la operación es idempotente; con tareas no idempotentes haría falta algo como ShedLock.
+- **Swagger UI es público.**
+- **Reglas de dominio mínimas:** no hay duración máxima de reserva, límite de reservas por usuario ni horarios de atención.
